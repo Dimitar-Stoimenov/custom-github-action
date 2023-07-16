@@ -1,0 +1,8 @@
+name: "Label new pr"
+description: "add"
+author: "Dimitar Stoimenov"
+
+runs:
+  using: "node16"
+  main: "dist/index.js"
+  
