@@ -2,7 +2,14 @@ name: "Label new pr"
 description: "add"
 author: "Dimitar Stoimenov"
 
+inputs:
+  gn-token:
+    description: "The Github token for authentication."
+    required: true
+  label:
+    description: "The label to be applied to the pull request"
+    required: true
+
 runs:
   using: "node16"
   main: "dist/index.js"
-  
