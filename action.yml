@@ -3,7 +3,7 @@ description: "add"
 author: "Dimitar Stoimenov"
 
 inputs:
-  gn-token:
+  gh-token:
     description: "The Github token for authentication."
     required: true
   label:
