@@ -1,14 +1,14 @@
 name: "Hello"
 
-on: 
-	workflow_dispatch:
+on:
+  workflow_dispatch:
 
 jobs: 
-	hello:
-		runs-on: ubuntu-latest
-		steps:
-			- uses: actions/checkout@v2
-			- uses: ./
-			with:
-				who-to-greet: "mona the octocat"
-				greeting: "Hello"
+  hello:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./ 
+        with:
+          who-to-greet: "mona the octocat"
+          greeting: "Hello"
