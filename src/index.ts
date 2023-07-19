@@ -57,11 +57,9 @@ async function run() {
 								{
 									path: resultObject.filePath,
 									start_line: resultObject.lineNumber,
-									end_line: resultObject.lineNumber,
 									annotation_level: 'failure',
 									message: resultObject.errorMessage,
 									start_column: resultObject.columnNumber,
-									end_column: resultObject.columnNumber
 								}
 							]
 						}
