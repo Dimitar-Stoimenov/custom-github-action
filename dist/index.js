@@ -35,13 +35,13 @@ const github_1 = __nccwpck_require__(5438);
 const fs = __importStar(__nccwpck_require__(7147));
 async function run() {
     var _a;
-    const token = (0, core_1.getInput)("gh-token");
+    const token = (0, core_1.getInput)('gh-token');
     const octokit = (0, github_1.getOctokit)(token);
     const pullRequest = github_1.context.payload.pull_request;
-    const filePath = "./tsc_errors.txt";
+    const filePath = './tsc_errors.txt';
     try {
         if (!pullRequest) {
-            throw new Error("This action can only be run on Pull Requests");
+            throw new Error('This action can only be run on Pull Requests');
         }
         fs.readFile(filePath, 'utf8', async (err, data) => {
             if (err) {
@@ -49,7 +49,10 @@ async function run() {
                 return;
             }
             // Split the file content by new lines to get an array of lines
-            const lines = data.split('\n').filter((line) => line !== "");
+            const lines = data
+                .split('\n')
+                .filter((line) => line !== '');
+            const annotations = [];
             for (let i = 0; i < lines.length; i += 1) {
                 const line = lines[i];
                 const regex = /^(.*\.tsx?)\((\d+),(\d+)\):\s(error .*)$/;
@@ -65,39 +68,34 @@ async function run() {
                         columnNumber: columnNumber,
                         errorMessage: errorMessage,
                     };
-                    await octokit.rest.checks.create({
-                        owner: github_1.context.repo.owner,
-                        repo: github_1.context.repo.repo,
-                        name: 'Validator',
-                        head_sha: github_1.context.sha,
-                        status: 'completed',
-                        conclusion: 'failure',
-                        output: {
-                            title: 'README.md must start with a title',
-                            summary: 'Please use markdown syntax to create a title',
-                            annotations: [
-                                {
-                                    path: resultObject.filePath,
-                                    start_line: resultObject.lineNumber,
-                                    end_line: resultObject.lineNumber,
-                                    annotation_level: 'failure',
-                                    message: resultObject.errorMessage
-                                }
-                            ]
-                        }
+                    annotations.push({
+                        path: resultObject.filePath,
+                        start_line: resultObject.lineNumber,
+                        end_line: resultObject.lineNumber,
+                        annotation_level: 'failure',
+                        message: resultObject.errorMessage,
                     });
                 }
             }
+            if (annotations.length > 0) {
+                await octokit.rest.checks.create({
+                    owner: github_1.context.repo.owner,
+                    repo: github_1.context.repo.repo,
+                    name: 'Validator',
+                    head_sha: github_1.context.sha,
+                    status: 'completed',
+                    conclusion: 'failure',
+                    output: {
+                        title: 'Typescript Error',
+                        summary: '',
+                        annotations: annotations,
+                    },
+                });
+            }
         });
-        // await octokit.rest.issues.addLabels({
-        // 	owner: context.repo.owner,
-        // 	repo: context.repo.repo,
-        // 	issue_number: pullRequest.number,
-        // 	labels: [label]
-        // })
     }
     catch (error) {
-        (0, core_1.setFailed)((_a = error === null || error === void 0 ? void 0 : error.message) !== null && _a !== void 0 ? _a : "Unknown error");
+        (0, core_1.setFailed)((_a = error === null || error === void 0 ? void 0 : error.message) !== null && _a !== void 0 ? _a : 'Unknown error');
     }
 }
 run();
