@@ -50,8 +50,8 @@ async function run() {
 
                     annotations.push({
                         path: resultObject.filePath,
-                        start_line: resultObject.lineNumber,
-                        end_line: resultObject.lineNumber,
+                        line: resultObject.lineNumber,
+                        // end_line: resultObject.lineNumber,
                         annotation_level: 'warning',
                         message: resultObject.errorMessage,
                     });
