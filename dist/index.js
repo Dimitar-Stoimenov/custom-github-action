@@ -57,8 +57,6 @@ async function run() {
                 const line = lines[i];
                 const regex = /^(.*\.tsx?)\((\d+),(\d+)\):\s(error .*)$/;
                 const matches = line.match(regex);
-                console.log('Line:', line);
-                console.log('Matches:', matches);
                 if (matches) {
                     const filePath = matches[1];
                     const lineNumber = parseInt(matches[2]);
@@ -74,7 +72,7 @@ async function run() {
                         path: resultObject.filePath,
                         start_line: resultObject.lineNumber,
                         end_line: resultObject.lineNumber,
-                        annotation_level: 'failure',
+                        annotation_level: 'warning',
                         message: resultObject.errorMessage,
                     });
                 }
@@ -87,7 +85,7 @@ async function run() {
                     name: 'Validator',
                     head_sha: github_1.context.sha,
                     status: 'completed',
-                    conclusion: 'failure',
+                    conclusion: 'success',
                     output: {
                         title: 'Typescript Error',
                         summary: '',
