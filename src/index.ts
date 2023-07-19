@@ -27,29 +27,46 @@ async function run() {
 			for (let i = 0; i < lines.length; i += 1) {
 				const line = lines[i];
 
-				await octokit.rest.checks.create({
-					owner: context.repo.owner,
-					repo: context.repo.repo,
-					name: 'Validator',
-					head_sha: context.sha,
-					status: 'completed',
-					conclusion: 'failure',
-					output: {
-						title: 'README.md must start with a title',
-						summary: 'Please use markdown syntax to create a title',
-						annotations: [
-							{
-								path: 'client/app/pages/Analytics/pages/IndividualMarket/IndividualMarket.tsx',
-								start_line: 1,
-								end_line: 1,
-								annotation_level: 'failure',
-								message: 'README.md must start with a header',
-								start_column: 1,
-								end_column: 1
-							}
-						]
-					}
-				})				
+				const regex = /^(.*\.tsx?)\((\d+),(\d+)\):\s(error .*)$/;
+                const matches = line.match(regex);
+
+				if (matches) {
+					const filePath = matches[1];
+					const lineNumber = parseInt(matches[2]);
+					const columnNumber = parseInt(matches[3]);
+					const errorMessage = matches[4];
+	
+					const resultObject = {
+						filePath: filePath,
+						lineNumber: lineNumber,
+						columnNumber: columnNumber,
+						errorMessage: errorMessage,
+					};
+
+					await octokit.rest.checks.create({
+						owner: context.repo.owner,
+						repo: context.repo.repo,
+						name: 'Validator',
+						head_sha: context.sha,
+						status: 'completed',
+						conclusion: 'failure',
+						output: {
+							title: 'README.md must start with a title',
+							summary: 'Please use markdown syntax to create a title',
+							annotations: [
+								{
+									path: resultObject.filePath,
+									start_line: resultObject.lineNumber,
+									end_line: resultObject.lineNumber,
+									annotation_level: 'failure',
+									message: resultObject.errorMessage,
+									start_column: resultObject.columnNumber,
+									end_column: resultObject.columnNumber
+								}
+							]
+						}
+					})
+				}								
 			}
 		});
 
