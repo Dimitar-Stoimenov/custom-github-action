@@ -41,38 +41,59 @@ async function run() {
                     const columnNumber = parseInt(matches[3]);
                     const errorMessage = matches[4];
 
-                    const resultObject = {
-                        filePath: filePath,
-                        lineNumber: lineNumber,
-                        columnNumber: columnNumber,
-                        errorMessage: errorMessage,
-                    };
-
-                    annotations.push({
-                        path: resultObject.filePath,
-                        line: resultObject.lineNumber,
-                        // end_line: resultObject.lineNumber,
+                    const annotation = {
+                        path: filePath,
+                        start_line: lineNumber,
+                        end_line: lineNumber,
                         annotation_level: 'warning',
-                        message: resultObject.errorMessage,
-                    });
+                        message: errorMessage,
+                    };
+            
+                    annotations.push(annotation);
                 }
             }
-console.log(annotations);
-            if (annotations.length > 0) {
-                await octokit.rest.checks.create({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    name: 'Validator',
-                    head_sha: context.sha,
-                    status: 'completed',
-                    conclusion: 'success',
-                    output: {
-                        title: 'Typescript Error',
-                        summary: '',
-                        annotations: annotations,
-                    },
-                });
-            }
+
+            // if (annotations.length > 0) {
+            //     await octokit.rest.checks.create({
+            //         owner: context.repo.owner,
+            //         repo: context.repo.repo,
+            //         name: 'Validator',
+            //         head_sha: context.sha,
+            //         status: 'completed',
+            //         conclusion: 'success',
+            //         output: {
+            //             title: 'Typescript Error',
+            //             summary: '',
+            //             annotations: annotations,
+            //         },
+            //     });
+            // }
+
+            // Step 1: Create the initial check run
+            const checkRun = await octokit.rest.checks.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: 'Validator',
+                head_sha: context.sha,
+                status: 'in_progress', // Set the status to 'in_progress' while processing
+            });
+console.log("checkRun:")
+console.log(checkRun?.data?.id)
+console.log("headSha:")
+console.log(pullRequest?.head?.sha)
+            // Step 2: Add the annotations using check run update
+            await octokit.rest.checks.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                check_run_id: checkRun.data.id,
+                status: 'completed',
+                conclusion: 'failure',
+                output: {
+                    title: 'Typescript Error',
+                    summary: '',
+                    annotations: annotations,
+                },
+            });
         });
     } catch (error) {
         setFailed((error as Error)?.message ?? 'Unknown error');

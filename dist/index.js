@@ -44,6 +44,7 @@ async function run() {
             throw new Error('This action can only be run on Pull Requests');
         }
         fs.readFile(filePath, 'utf8', async (err, data) => {
+            var _a, _b;
             if (err) {
                 console.error(err);
                 return;
@@ -62,37 +63,56 @@ async function run() {
                     const lineNumber = parseInt(matches[2]);
                     const columnNumber = parseInt(matches[3]);
                     const errorMessage = matches[4];
-                    const resultObject = {
-                        filePath: filePath,
-                        lineNumber: lineNumber,
-                        columnNumber: columnNumber,
-                        errorMessage: errorMessage,
-                    };
-                    annotations.push({
-                        path: resultObject.filePath,
-                        line: resultObject.lineNumber,
-                        // end_line: resultObject.lineNumber,
+                    const annotation = {
+                        path: filePath,
+                        start_line: lineNumber,
+                        end_line: lineNumber,
                         annotation_level: 'warning',
-                        message: resultObject.errorMessage,
-                    });
+                        message: errorMessage,
+                    };
+                    annotations.push(annotation);
                 }
             }
-            console.log(annotations);
-            if (annotations.length > 0) {
-                await octokit.rest.checks.create({
-                    owner: github_1.context.repo.owner,
-                    repo: github_1.context.repo.repo,
-                    name: 'Validator',
-                    head_sha: github_1.context.sha,
-                    status: 'completed',
-                    conclusion: 'success',
-                    output: {
-                        title: 'Typescript Error',
-                        summary: '',
-                        annotations: annotations,
-                    },
-                });
-            }
+            // if (annotations.length > 0) {
+            //     await octokit.rest.checks.create({
+            //         owner: context.repo.owner,
+            //         repo: context.repo.repo,
+            //         name: 'Validator',
+            //         head_sha: context.sha,
+            //         status: 'completed',
+            //         conclusion: 'success',
+            //         output: {
+            //             title: 'Typescript Error',
+            //             summary: '',
+            //             annotations: annotations,
+            //         },
+            //     });
+            // }
+            // Step 1: Create the initial check run
+            const checkRun = await octokit.rest.checks.create({
+                owner: github_1.context.repo.owner,
+                repo: github_1.context.repo.repo,
+                name: 'Validator',
+                head_sha: github_1.context.sha,
+                status: 'in_progress', // Set the status to 'in_progress' while processing
+            });
+            console.log("checkRun:");
+            console.log((_a = checkRun === null || checkRun === void 0 ? void 0 : checkRun.data) === null || _a === void 0 ? void 0 : _a.id);
+            console.log("headSha:");
+            console.log((_b = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.head) === null || _b === void 0 ? void 0 : _b.sha);
+            // Step 2: Add the annotations using check run update
+            await octokit.rest.checks.update({
+                owner: github_1.context.repo.owner,
+                repo: github_1.context.repo.repo,
+                check_run_id: checkRun.data.id,
+                status: 'completed',
+                conclusion: 'failure',
+                output: {
+                    title: 'Typescript Error',
+                    summary: '',
+                    annotations: annotations,
+                },
+            });
         });
     }
     catch (error) {
