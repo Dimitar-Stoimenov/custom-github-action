@@ -1,13 +1,10 @@
-name: "Label new pr"
-description: "add"
+name: "Annotate PR with Typescript errors"
+description: "Add comments"
 author: "Dimitar Stoimenov"
 
 inputs:
   gh-token:
     description: "The Github token for authentication."
-    required: true
-  label:
-    description: "The label to be applied to the pull request"
     required: true
 
 runs:
