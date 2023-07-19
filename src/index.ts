@@ -35,6 +35,9 @@ async function run() {
                 const regex = /^(.*\.tsx?)\((\d+),(\d+)\):\s(error .*)$/;
                 const matches = line.match(regex);
 
+                console.log('Line:', line);
+                console.log('Matches:', matches);
+
                 if (matches) {
                     const filePath = matches[1];
                     const lineNumber = parseInt(matches[2]);
@@ -57,7 +60,7 @@ async function run() {
                     });
                 }
             }
-
+console.log(annotations);
             if (annotations.length > 0) {
                 await octokit.rest.checks.create({
                     owner: context.repo.owner,
