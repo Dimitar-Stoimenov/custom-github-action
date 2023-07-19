@@ -44,7 +44,6 @@ async function run() {
             throw new Error('This action can only be run on Pull Requests');
         }
         fs.readFile(filePath, 'utf8', async (err, data) => {
-            var _a, _b;
             if (err) {
                 console.error(err);
                 return;
@@ -65,8 +64,9 @@ async function run() {
                     const errorMessage = matches[4];
                     const annotation = {
                         path: filePath,
+                        title: "Typescript error",
                         start_line: lineNumber,
-                        end_line: lineNumber,
+                        end_line: lineNumber + 1,
                         annotation_level: 'warning',
                         message: errorMessage,
                     };
@@ -96,10 +96,6 @@ async function run() {
                 head_sha: github_1.context.sha,
                 status: 'in_progress', // Set the status to 'in_progress' while processing
             });
-            console.log("checkRun:");
-            console.log((_a = checkRun === null || checkRun === void 0 ? void 0 : checkRun.data) === null || _a === void 0 ? void 0 : _a.id);
-            console.log("headSha:");
-            console.log((_b = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.head) === null || _b === void 0 ? void 0 : _b.sha);
             // Step 2: Add the annotations using check run update
             await octokit.rest.checks.update({
                 owner: github_1.context.repo.owner,
@@ -107,6 +103,7 @@ async function run() {
                 check_run_id: checkRun.data.id,
                 status: 'completed',
                 conclusion: 'failure',
+                text: "hi",
                 output: {
                     title: 'Typescript Error',
                     summary: '',

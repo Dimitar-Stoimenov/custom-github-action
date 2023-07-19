@@ -43,8 +43,9 @@ async function run() {
 
                     const annotation = {
                         path: filePath,
+                        title: "Typescript error",
                         start_line: lineNumber,
-                        end_line: lineNumber,
+                        end_line: lineNumber+1,
                         annotation_level: 'warning',
                         message: errorMessage,
                     };
@@ -77,10 +78,7 @@ async function run() {
                 head_sha: context.sha,
                 status: 'in_progress', // Set the status to 'in_progress' while processing
             });
-console.log("checkRun:")
-console.log(checkRun?.data?.id)
-console.log("headSha:")
-console.log(pullRequest?.head?.sha)
+
             // Step 2: Add the annotations using check run update
             await octokit.rest.checks.update({
                 owner: context.repo.owner,
@@ -88,6 +86,7 @@ console.log(pullRequest?.head?.sha)
                 check_run_id: checkRun.data.id,
                 status: 'completed',
                 conclusion: 'failure',
+                text: "hi",
                 output: {
                     title: 'Typescript Error',
                     summary: '',
