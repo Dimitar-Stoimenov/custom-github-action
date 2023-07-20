@@ -28,7 +28,8 @@ async function run() {
                 .split('\n')
                 .filter((line: string) => line !== '');
 
-            const annotations = [];
+            const pullRequestNumber = pullRequest.number;
+            // const annotations = [];
 
             for (let i = 0; i < lines.length; i += 1) {
                 const line = lines[i];
@@ -41,18 +42,36 @@ async function run() {
                     const columnNumber = parseInt(matches[3]);
                     const errorMessage = matches[4];
 
-                    const annotation = {
-                        path: filePath,
-                        title: "Typescript error",
-                        start_line: lineNumber,
-                        end_line: lineNumber+1,
-                        annotation_level: 'warning',
-                        message: errorMessage,
-                    };
+                //     const annotation = {
+                //         path: filePath,
+                //         title: "Typescript error",
+                //         start_line: lineNumber,
+                //         end_line: lineNumber+1,
+                //         annotation_level: 'warning',
+                //         message: errorMessage,
+                //     };
             
-                    annotations.push(annotation);
-                }
+                //     annotations.push(annotation);
+                // }
+
+                const comment = {
+                    body: `Error: ${errorMessage}`,
+                    path: filePath,
+                    position: lineNumber,
+                  };
+              
+                  // Create the comment on the pull request
+                  await octokit.rest.pulls.createReviewComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    pull_number: pullRequestNumber,
+                    body: comment.body,
+                    commit_id: context.sha,
+                    path: comment.path,
+                    position: comment.position,
+                  });
             }
+        }
 
             // if (annotations.length > 0) {
             //     await octokit.rest.checks.create({
@@ -71,28 +90,28 @@ async function run() {
             // }
 
             // Step 1: Create the initial check run
-            const checkRun = await octokit.rest.checks.create({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                name: 'Validator',
-                head_sha: context.sha,
-                status: 'in_progress', // Set the status to 'in_progress' while processing
-            });
+            // const checkRun = await octokit.rest.checks.create({
+            //     owner: context.repo.owner,
+            //     repo: context.repo.repo,
+            //     name: 'Validator',
+            //     head_sha: context.sha,
+            //     status: 'in_progress', // Set the status to 'in_progress' while processing
+            // });
 
-            // Step 2: Add the annotations using check run update
-            await octokit.rest.checks.update({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                check_run_id: checkRun.data.id,
-                status: 'completed',
-                conclusion: 'failure',
-                text: "hi",
-                output: {
-                    title: 'Typescript Error',
-                    summary: '',
-                    annotations: annotations,
-                },
-            });
+            // // Step 2: Add the annotations using check run update
+            // await octokit.rest.checks.update({
+            //     owner: context.repo.owner,
+            //     repo: context.repo.repo,
+            //     check_run_id: checkRun.data.id,
+            //     status: 'completed',
+            //     conclusion: 'failure',
+            //     text: "hi",
+            //     output: {
+            //         title: 'Typescript Error',
+            //         summary: '',
+            //         annotations: annotations,
+            //     },
+            // });
         });
     } catch (error) {
         setFailed((error as Error)?.message ?? 'Unknown error');
