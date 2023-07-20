@@ -78,16 +78,17 @@ async function run() {
                         path: filePath,
                         position: lineNumber,
                     };
+                    console.log(comment);
                     // Create the comment on the pull request
-                    await octokit.rest.pulls.createReviewComment({
-                        owner: github_1.context.repo.owner,
-                        repo: github_1.context.repo.repo,
-                        pull_number: pullRequestNumber,
-                        body: comment.body,
-                        commit_id: github_1.context.sha,
-                        path: comment.path,
-                        position: comment.position,
-                    });
+                    // await octokit.rest.pulls.createReviewComment({
+                    //     owner: context.repo.owner,
+                    //     repo: context.repo.repo,
+                    //     pull_number: pullRequestNumber,
+                    //     body: comment.body,
+                    //     commit_id: context.sha,
+                    //     path: comment.path,
+                    //     position: comment.position,
+                    // });
                 }
             }
             // if (annotations.length > 0) {
