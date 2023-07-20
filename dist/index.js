@@ -1,127 +1,6 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 4822:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core_1 = __nccwpck_require__(2186);
-const github_1 = __nccwpck_require__(5438);
-const fs = __importStar(__nccwpck_require__(7147));
-async function run() {
-    var _a;
-    const token = (0, core_1.getInput)('gh-token');
-    const octokit = (0, github_1.getOctokit)(token);
-    const pullRequest = github_1.context.payload.pull_request;
-    const filePath = './tsc_errors.txt';
-    try {
-        if (!pullRequest) {
-            throw new Error('This action can only be run on Pull Requests');
-        }
-        // fs.readFile(filePath, 'utf8', async (err: any, data: string) => {
-        // if (err) {
-        //     console.error(err);
-        //     return;
-        // }
-        const data = fs.readFileSync(filePath, 'utf8');
-        // Split the file content by new lines to get an array of lines
-        const lines = data
-            .split('\n')
-            .filter((line) => line !== '');
-        const annotations = [];
-        for (let i = 0; i < lines.length; i += 1) {
-            const line = lines[i];
-            const regex = /^(.*\.tsx?)\((\d+),(\d+)\):\s(error .*)$/;
-            const matches = line.match(regex);
-            if (matches) {
-                const filePath = matches[1];
-                const lineNumber = parseInt(matches[2]);
-                const columnNumber = parseInt(matches[3]);
-                const errorMessage = matches[4];
-                const annotation = {
-                    path: filePath,
-                    title: "Typescript error",
-                    start_line: lineNumber,
-                    end_line: lineNumber,
-                    annotation_level: 'warning',
-                    message: errorMessage,
-                };
-                annotations.push(annotation);
-            }
-        }
-        // if (annotations.length > 0) {
-        //     await octokit.rest.checks.create({
-        //         owner: context.repo.owner,
-        //         repo: context.repo.repo,
-        //         name: 'Validator',
-        //         head_sha: context.sha,
-        //         status: 'completed',
-        //         conclusion: 'success',
-        //         output: {
-        //             title: 'Typescript Error',
-        //             summary: '',
-        //             annotations: annotations,
-        //         },
-        //     });
-        // }
-        // Step 1: Create the initial check run
-        const checkRun = await octokit.rest.checks.create({
-            owner: github_1.context.repo.owner,
-            repo: github_1.context.repo.repo,
-            name: 'Validator',
-            head_sha: github_1.context.sha,
-            status: 'in_progress', // Set the status to 'in_progress' while processing
-        });
-        // Step 2: Add the annotations using check run update
-        await octokit.rest.checks.update({
-            owner: github_1.context.repo.owner,
-            repo: github_1.context.repo.repo,
-            check_run_id: checkRun.data.id,
-            status: 'completed',
-            conclusion: 'failure',
-            text: "hi",
-            output: {
-                title: 'Typescript Error',
-                summary: '',
-                annotations: annotations,
-            },
-            // });
-        });
-    }
-    catch (error) {
-        (0, core_1.setFailed)((_a = error === null || error === void 0 ? void 0 : error.message) !== null && _a !== void 0 ? _a : 'Unknown error');
-    }
-}
-run();
-
-
-/***/ }),
-
 /***/ 7351:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -9910,12 +9789,104 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
 /******/ 	
 /************************************************************************/
-/******/ 	
-/******/ 	// startup
-/******/ 	// Load entry module and return exports
-/******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __nccwpck_require__(4822);
-/******/ 	module.exports = __webpack_exports__;
-/******/ 	
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
+(() => {
+"use strict";
+var exports = __webpack_exports__;
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const core_1 = __nccwpck_require__(2186);
+const github_1 = __nccwpck_require__(5438);
+async function run() {
+    const token = (0, core_1.getInput)('gh-token');
+    const octokit = (0, github_1.getOctokit)(token);
+    const pullRequest = github_1.context.payload.pull_request;
+    const filePath = './tsc_errors.txt';
+    console.log("I do nothing.");
+    // try {
+    //     if (!pullRequest) {
+    //         throw new Error(
+    //             'This action can only be run on Pull Requests',
+    //         );
+    //     }
+    //     // fs.readFile(filePath, 'utf8', async (err: any, data: string) => {
+    //         // if (err) {
+    //         //     console.error(err);
+    //         //     return;
+    //         // }
+    //         const data = fs.readFileSync(filePath, 'utf8');
+    //         // Split the file content by new lines to get an array of lines
+    //         const lines = data
+    //             .split('\n')
+    //             .filter((line: string) => line !== '');
+    //         const annotations = [];
+    //         for (let i = 0; i < lines.length; i += 1) {
+    //             const line = lines[i];
+    //             const regex = /^(.*\.tsx?)\((\d+),(\d+)\):\s(error .*)$/;
+    //             const matches = line.match(regex);
+    //             if (matches) {
+    //                 const filePath = matches[1];
+    //                 const lineNumber = parseInt(matches[2]);
+    //                 const columnNumber = parseInt(matches[3]);
+    //                 const errorMessage = matches[4];
+    //                 const annotation = {
+    //                     path: filePath,
+    //                     title: "Typescript error",
+    //                     start_line: lineNumber,
+    //                     end_line: lineNumber,
+    //                     annotation_level: 'warning',
+    //                     message: errorMessage,
+    //                 };
+    //                 annotations.push(annotation);
+    //             }
+    //         }
+    //         // if (annotations.length > 0) {
+    //         //     await octokit.rest.checks.create({
+    //         //         owner: context.repo.owner,
+    //         //         repo: context.repo.repo,
+    //         //         name: 'Validator',
+    //         //         head_sha: context.sha,
+    //         //         status: 'completed',
+    //         //         conclusion: 'success',
+    //         //         output: {
+    //         //             title: 'Typescript Error',
+    //         //             summary: '',
+    //         //             annotations: annotations,
+    //         //         },
+    //         //     });
+    //         // }
+    //         // Step 1: Create the initial check run
+    //         const checkRun = await octokit.rest.checks.create({
+    //             owner: context.repo.owner,
+    //             repo: context.repo.repo,
+    //             name: 'Validator',
+    //             head_sha: context.sha,
+    //             status: 'in_progress', // Set the status to 'in_progress' while processing
+    //         });
+    //         // Step 2: Add the annotations using check run update
+    //         await octokit.rest.checks.update({
+    //             owner: context.repo.owner,
+    //             repo: context.repo.repo,
+    //             check_run_id: checkRun.data.id,
+    //             status: 'completed',
+    //             conclusion: 'failure',
+    //             text: "hi",
+    //             output: {
+    //                 title: 'Typescript Error',
+    //                 summary: '',
+    //                 annotations: annotations,
+    //             },
+    //         // });
+    //     });
+    // } catch (error) {
+    //     setFailed((error as Error)?.message ?? 'Unknown error');
+    // }
+}
+run();
+
+})();
+
+module.exports = __webpack_exports__;
 /******/ })()
 ;
