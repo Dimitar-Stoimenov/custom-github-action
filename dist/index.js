@@ -52,8 +52,7 @@ async function run() {
             const lines = data
                 .split('\n')
                 .filter((line) => line !== '');
-            const pullRequestNumber = pullRequest.number;
-            // const annotations = [];
+            const annotations = [];
             for (let i = 0; i < lines.length; i += 1) {
                 const line = lines[i];
                 const regex = /^(.*\.tsx?)\((\d+),(\d+)\):\s(error .*)$/;
@@ -63,31 +62,15 @@ async function run() {
                     const lineNumber = parseInt(matches[2]);
                     const columnNumber = parseInt(matches[3]);
                     const errorMessage = matches[4];
-                    //     const annotation = {
-                    //         path: filePath,
-                    //         title: "Typescript error",
-                    //         start_line: lineNumber,
-                    //         end_line: lineNumber+1,
-                    //         annotation_level: 'warning',
-                    //         message: errorMessage,
-                    //     };
-                    //     annotations.push(annotation);
-                    // }
-                    const comment = {
-                        body: `Error: ${errorMessage}`,
+                    const annotation = {
                         path: filePath,
-                        position: lineNumber,
+                        title: "Typescript error",
+                        start_line: lineNumber,
+                        end_line: lineNumber,
+                        annotation_level: 'warning',
+                        message: errorMessage,
                     };
-                    // Create the comment on the pull request
-                    await octokit.rest.pulls.createReviewComment({
-                        owner: github_1.context.repo.owner,
-                        repo: github_1.context.repo.repo,
-                        pull_number: pullRequestNumber,
-                        body: comment.body,
-                        commit_id: github_1.context.sha,
-                        path: comment.path,
-                        position: comment.position,
-                    });
+                    annotations.push(annotation);
                 }
             }
             // if (annotations.length > 0) {
@@ -106,27 +89,27 @@ async function run() {
             //     });
             // }
             // Step 1: Create the initial check run
-            // const checkRun = await octokit.rest.checks.create({
-            //     owner: context.repo.owner,
-            //     repo: context.repo.repo,
-            //     name: 'Validator',
-            //     head_sha: context.sha,
-            //     status: 'in_progress', // Set the status to 'in_progress' while processing
-            // });
-            // // Step 2: Add the annotations using check run update
-            // await octokit.rest.checks.update({
-            //     owner: context.repo.owner,
-            //     repo: context.repo.repo,
-            //     check_run_id: checkRun.data.id,
-            //     status: 'completed',
-            //     conclusion: 'failure',
-            //     text: "hi",
-            //     output: {
-            //         title: 'Typescript Error',
-            //         summary: '',
-            //         annotations: annotations,
-            //     },
-            // });
+            const checkRun = await octokit.rest.checks.create({
+                owner: github_1.context.repo.owner,
+                repo: github_1.context.repo.repo,
+                name: 'Validator',
+                head_sha: github_1.context.sha,
+                status: 'in_progress', // Set the status to 'in_progress' while processing
+            });
+            // Step 2: Add the annotations using check run update
+            await octokit.rest.checks.update({
+                owner: github_1.context.repo.owner,
+                repo: github_1.context.repo.repo,
+                check_run_id: checkRun.data.id,
+                status: 'completed',
+                conclusion: 'failure',
+                text: "hi",
+                output: {
+                    title: 'Typescript Error',
+                    summary: '',
+                    annotations: annotations,
+                },
+            });
         });
     }
     catch (error) {
