@@ -17,12 +17,12 @@ async function run() {
             );
         }
 
-        fs.readFile(filePath, 'utf8', async (err: any, data: string) => {
-            if (err) {
-                console.error(err);
-                return;
-            }
-
+        // fs.readFile(filePath, 'utf8', async (err: any, data: string) => {
+            // if (err) {
+            //     console.error(err);
+            //     return;
+            // }
+            const data = fs.readFileSync(filePath, 'utf8');
             // Split the file content by new lines to get an array of lines
             const lines = data
                 .split('\n')
@@ -51,8 +51,8 @@ async function run() {
                     };
             
                     annotations.push(annotation);
+                }
             }
-        }
 
             // if (annotations.length > 0) {
             //     await octokit.rest.checks.create({
@@ -92,7 +92,7 @@ async function run() {
                     summary: '',
                     annotations: annotations,
                 },
-            });
+            // });
         });
     } catch (error) {
         setFailed((error as Error)?.message ?? 'Unknown error');
