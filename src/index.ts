@@ -17,11 +17,12 @@ async function run() {
             );
         }
 
-        fs.readFile(filePath, 'utf8', async (err: any, data: string) => {
-            if (err) {
-                console.error(err);
-                return;
-            }
+        // fs.readFile(filePath, 'utf8', async (err: any, data: string) => {
+            // if (err) {
+            //     console.error(err);
+            //     return;
+            // }
+            const data = fs.readFileSync(filePath, 'utf8');
 
             const lines = data
                 .split('\n')
@@ -64,7 +65,7 @@ async function run() {
                         conclusion: 'success',
                         output: {
                             title: 'Typescript Error',
-                            summary: '',
+                            summary: 'Summary',
                             annotations: annotations,
                         },
                     });
@@ -78,7 +79,7 @@ async function run() {
             console.log("annotations were set.");
             console.log("annotations:");
             console.log(annotations);
-        });
+        // });
     } catch (error) {
         setFailed((error as Error)?.message ?? 'Unknown error');
     }
