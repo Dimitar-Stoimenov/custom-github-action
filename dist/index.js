@@ -73,19 +73,26 @@ async function run() {
                 }
             }
             if (annotations.length > 0) {
-                await octokit.rest.checks.create({
-                    owner: github_1.context.repo.owner,
-                    repo: github_1.context.repo.repo,
-                    name: 'Validator',
-                    head_sha: github_1.context.sha,
-                    status: 'completed',
-                    conclusion: 'success',
-                    output: {
-                        title: 'Typescript Error',
-                        summary: '',
-                        annotations: annotations,
-                    },
-                });
+                try {
+                    await octokit.rest.checks.create({
+                        owner: github_1.context.repo.owner,
+                        repo: github_1.context.repo.repo,
+                        name: 'Validator',
+                        head_sha: github_1.context.sha,
+                        status: 'completed',
+                        conclusion: 'success',
+                        output: {
+                            title: 'Typescript Error',
+                            summary: '',
+                            annotations: annotations,
+                        },
+                    });
+                    console.log("octokit action was successful");
+                }
+                catch (error) {
+                    console.log(error);
+                    console.log("octokit action failed");
+                }
             }
             console.log("annotations were set.");
             console.log("annotations:");
