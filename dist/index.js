@@ -34,10 +34,10 @@ const core_1 = __nccwpck_require__(186);
 const fs = __importStar(__nccwpck_require__(147));
 async function run() {
     var _a;
-    const baseClientPath = './coverage-base/shortClient.txt';
-    const baseServerPath = './coverage-base/shortServer.txt';
-    const prClientPath = './coverage-PR/shortClient.txt';
-    const prServerPath = './coverage-PR/shortServer.txt';
+    const baseClientPath = './coverage-base/short/shortClient.txt';
+    const baseServerPath = './coverage-base/short/shortServer.txt';
+    const prClientPath = './coverage-PR/short/shortClient.txt';
+    const prServerPath = './coverage-PR/short/shortServer.txt';
     const getParams = (input) => {
         const regex = /^(?<name>[a-zA-Z]+)\s*:\s(?<percentage>[0-9].*)%\s\(\s(?<tested>[0-9]*)\/(?<total>[0-9]*)\s\)/g;
         const match = regex.exec(input);
