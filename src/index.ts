@@ -3,10 +3,10 @@ import { getOctokit, context } from '@actions/github';
 import * as fs from 'fs';
 
 async function run() {
-    const baseClientPath = './coverage-base/shortClient.txt';
-    const baseServerPath = './coverage-base/shortServer.txt';
-    const prClientPath = './coverage-PR/shortClient.txt';
-    const prServerPath = './coverage-PR/shortServer.txt';
+    const baseClientPath = './coverage-base/short/shortClient.txt';
+    const baseServerPath = './coverage-base/short/shortServer.txt';
+    const prClientPath = './coverage-PR/short/shortClient.txt';
+    const prServerPath = './coverage-PR/short/shortServer.txt';
 
     const getParams = (input: string) => {
         const regex = /^(?<name>[a-zA-Z]+)\s*:\s(?<percentage>[0-9].*)%\s\(\s(?<tested>[0-9]*)\/(?<total>[0-9]*)\s\)/g;
