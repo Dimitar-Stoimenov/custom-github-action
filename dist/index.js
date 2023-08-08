@@ -34,6 +34,8 @@ const core_1 = __nccwpck_require__(186);
 const fs = __importStar(__nccwpck_require__(147));
 async function run() {
     var _a;
+    let deltaInput = Number((0, core_1.getInput)("delta"));
+    deltaInput = isNaN(deltaInput) || deltaInput === undefined ? 0 : -deltaInput;
     const baseClientPath = './coverage-base/short/shortClient.txt';
     const baseServerPath = './coverage-base/short/shortServer.txt';
     const prClientPath = './coverage-PR/short/shortClient.txt';
@@ -113,14 +115,14 @@ async function run() {
         console.log(`Functions    : ${clientFunctionsDiff > 0 ? "+" + clientFunctionsDiff.toFixed(2) : clientFunctionsDiff.toFixed(2)}%`);
         console.log(`Lines        : ${clientLinesDiff > 0 ? "+" + clientLinesDiff.toFixed(2) : clientLinesDiff.toFixed(2)}%`);
         console.log("================================================================================");
-        if (serverStatementsDiff < 0
-            || serverBranchesDiff < 0
-            || serverFunctionsDiff < 0
-            || serverLinesDiff < 0
-            || clientStatementsDiff < 0
-            || clientBranchesDiff < 0
-            || clientFunctionsDiff < 0
-            || clientLinesDiff < 0) {
+        if (serverStatementsDiff < deltaInput
+            || serverBranchesDiff < deltaInput
+            || serverFunctionsDiff < deltaInput
+            || serverLinesDiff < deltaInput
+            || clientStatementsDiff < deltaInput
+            || clientBranchesDiff < deltaInput
+            || clientFunctionsDiff < deltaInput
+            || clientLinesDiff < deltaInput) {
             const error = new Error();
             error.message = "The coverage is worse than before! You need to write some tests!";
             throw error;

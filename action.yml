@@ -1,10 +1,9 @@
-name: "Annotate PR with Typescript errors"
-description: "Add comments"
+name: "Compare Coverage Diff"
 author: "Dimitar Stoimenov"
 
 inputs:
-  gh-token:
-    description: "The Github token for authentication."
+  delta:
+    description: "Maximum allowed difference in percentage."
     required: true
 
 runs:

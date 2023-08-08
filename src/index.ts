@@ -1,8 +1,10 @@
 import { getInput, setFailed } from '@actions/core';
-import { getOctokit, context } from '@actions/github';
 import * as fs from 'fs';
 
 async function run() {
+	let deltaInput = Number(getInput("delta"));
+	deltaInput = isNaN(deltaInput) || deltaInput === undefined ? 0 : -deltaInput;
+
     const baseClientPath = './coverage-base/short/shortClient.txt';
     const baseServerPath = './coverage-base/short/shortServer.txt';
     const prClientPath = './coverage-PR/short/shortClient.txt';
@@ -107,14 +109,14 @@ async function run() {
 		console.log("================================================================================");
 
       	if (
-        	serverStatementsDiff < 0
-			|| serverBranchesDiff < 0
-			|| serverFunctionsDiff < 0
-			|| serverLinesDiff < 0
-			|| clientStatementsDiff < 0
-			|| clientBranchesDiff < 0
-			|| clientFunctionsDiff < 0
-			|| clientLinesDiff < 0
+        	serverStatementsDiff < deltaInput
+			|| serverBranchesDiff < deltaInput
+			|| serverFunctionsDiff < deltaInput
+			|| serverLinesDiff < deltaInput
+			|| clientStatementsDiff < deltaInput
+			|| clientBranchesDiff < deltaInput
+			|| clientFunctionsDiff < deltaInput
+			|| clientLinesDiff < deltaInput
         ) {
 			const error = new Error();
 			error.message = "The coverage is worse than before! You need to write some tests!"
