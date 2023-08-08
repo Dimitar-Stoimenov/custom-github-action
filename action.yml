@@ -1,10 +1,10 @@
 name: "Compare Coverage Diff"
 author: "Dimitar Stoimenov"
 
-inputs:
-  delta:
-    description: "Maximum allowed difference in percentage."
-    required: true
+# inputs:
+#   delta:
+#     description: "Maximum allowed difference in percentage."
+#     required: true
 
 runs:
   using: "node16"
