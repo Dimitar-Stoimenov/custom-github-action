@@ -1,40 +1,66 @@
 import { getInput, setFailed } from '@actions/core';
 import * as fs from 'fs';
 
-async function run() {
-	// let deltaInput = Number(getInput("delta"));
-	// deltaInput = isNaN(deltaInput) || deltaInput === undefined ? 0 : -deltaInput;
+interface CoverageInterface {
+	"total": number;
+	"covered": number;
+	"skipped": number;
+	"pct": number;
+}
 
-    const basePath = './coverage-diff/base-summary.json';
-    const prPath = './coverage-diff/pr-summary.json';
+interface SingleFileInterface {
+	"lines": CoverageInterface;
+	"functions": CoverageInterface;
+	"statements": CoverageInterface;
+	"branches": CoverageInterface;
+}
+
+interface JSONInterface {
+	[x: string]: SingleFileInterface;
+}
+
+const compareFileCoverage = (prFile: SingleFileInterface, baseFile: SingleFileInterface, fileName: string) => {
+	if (!baseFile) {
+		console.log(`${fileName} is a new file. Write tests for it!`)
+	}
+
+};
+
+async function run() {
+    const basePath = './coverage-base/coverage-summary.json';
+    const prPath = './coverage-pr/coverage-summary.json';
 
     try {
 		const baseResultJSON = fs.readFileSync(basePath, 'utf8');
 		const prResultJSON = fs.readFileSync(prPath, 'utf8');
 
-		const baseResultObject = JSON.parse(baseResultJSON);
-		const prResultObject = JSON.parse(prResultJSON);
+		const baseResultObject: JSONInterface = JSON.parse(baseResultJSON);
+		const prResultObject: JSONInterface = JSON.parse(prResultJSON);
 
-		console.log('base total:')
-		const keys = Object.keys(baseResultObject);
+		const baseResultTotal = baseResultObject.total;
+		const prResultTotal = prResultObject.total;
 
-		console.log(keys[15])
-		console.log(keys[125])
-		console.log(keys[235])
-		console.log(keys[245])
-		// console.log("================================ Server summary ================================")
-		// console.log(`Statements   : ${serverStatementsDiff > 0 ? "+" + serverStatementsDiff.toFixed(2) : serverStatementsDiff.toFixed(2)}%`)
-		// console.log(`Branches     : ${serverBranchesDiff > 0 ? "+" + serverBranchesDiff.toFixed(2) : serverBranchesDiff.toFixed(2)}%`)
-		// console.log(`Functions    : ${serverFunctionsDiff > 0 ? "+" + serverFunctionsDiff.toFixed(2) : serverFunctionsDiff.toFixed(2)}%`)
-		// console.log(`Lines        : ${serverLinesDiff > 0 ? "+" + serverLinesDiff.toFixed(2) : serverLinesDiff.toFixed(2)}%`)
-		// console.log("================================================================================");
-		// console.log(" ")
-		// console.log("================================ Client summary ================================")
-		// console.log(`Statements   : ${clientStatementsDiff > 0 ? "+" + clientStatementsDiff.toFixed(2) : clientStatementsDiff.toFixed(2)}%`)
-		// console.log(`Branches     : ${clientBranchesDiff > 0 ? "+" + clientBranchesDiff.toFixed(2) : clientBranchesDiff.toFixed(2)}%`)
-		// console.log(`Functions    : ${clientFunctionsDiff > 0 ? "+" + clientFunctionsDiff.toFixed(2) : clientFunctionsDiff.toFixed(2)}%`)
-		// console.log(`Lines        : ${clientLinesDiff > 0 ? "+" + clientLinesDiff.toFixed(2) : clientLinesDiff.toFixed(2)}%`)
-		// console.log("================================================================================");
+		const statementsDiff = prResultTotal.statements.pct - baseResultTotal.statements.pct;
+		const branchesDiff = prResultTotal.branches.pct - baseResultTotal.branches.pct;
+		const functionsDiff = prResultTotal.functions.pct - baseResultTotal.functions.pct;
+		const linesDiff = prResultTotal.lines.pct - baseResultTotal.lines.pct;
+
+		const prFiles = Object.keys(prResultObject);
+
+		for (let i = 0; i < prFiles.length; i++) {
+			const fileName = prFiles[i];
+
+			const result = compareFileCoverage(prResultObject[fileName], baseResultObject[fileName], fileName);
+			
+
+		}
+
+		console.log("=============================== Coverage summary ===============================")
+		console.log(`Statements   : ${statementsDiff > 0 ? "+" + statementsDiff.toFixed(2) : statementsDiff.toFixed(2)}%`)
+		console.log(`Branches     : ${branchesDiff > 0 ? "+" + branchesDiff.toFixed(2) : branchesDiff.toFixed(2)}%`)
+		console.log(`Functions    : ${functionsDiff > 0 ? "+" + functionsDiff.toFixed(2) : functionsDiff.toFixed(2)}%`)
+		console.log(`Lines        : ${linesDiff > 0 ? "+" + linesDiff.toFixed(2) : linesDiff.toFixed(2)}%`)
+		console.log("================================================================================");
     } catch (error) {
         setFailed((error as Error)?.message ?? 'Unknown error');
     }
