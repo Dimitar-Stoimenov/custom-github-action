@@ -33,7 +33,7 @@ async function run() {
 	const singleLineCoverageTolerance = +getInput("singleLineCoverageTolerance") || 0;
 
 	console.log(`General coverage tolerance: ${generalCoverageTolerance.toFixed(2)}%`);
-	console.log(`Single line coverage tolerance: ${singleLineCoverageTolerance.toFixed(2)}%`);
+	console.log(`Single file coverage tolerance: ${singleLineCoverageTolerance.toFixed(2)}%`);
 	console.log("");
 
     const basePath = './coverage-base/coverage-summary.json';
