@@ -1,10 +1,13 @@
 name: "Compare Coverage Diff"
 author: "Dimitar Stoimenov"
 
-# inputs:
-#   delta:
-#     description: "Maximum allowed difference in percentage."
-#     required: true
+inputs:
+  generalCoverageTolerance:
+    description: "Maximum allowed difference in percentage for the entire project."
+    required: true
+  singleLineCoverageTolerance:
+    description: "Maximum allowed difference in percentage for a single file."
+    required: true
 
 runs:
   using: "node16"
