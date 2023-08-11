@@ -37,6 +37,9 @@ async function run() {
     let diffs = [];
     const generalCoverageTolerance = +(0, core_1.getInput)("generalCoverageTolerance") || 0;
     const singleLineCoverageTolerance = +(0, core_1.getInput)("singleLineCoverageTolerance") || 0;
+    console.log(`General coverage tolerance: ${generalCoverageTolerance.toFixed(2)}%`);
+    console.log(`Single line coverage tolerance: ${singleLineCoverageTolerance.toFixed(2)}%`);
+    console.log("");
     const basePath = './coverage-base/coverage-summary.json';
     const prPath = './coverage-pr/coverage-summary.json';
     const compareFileCoverage = (prFileObj, baseFileObj, fileName) => {
