@@ -1,4 +1,4 @@
-import { setFailed } from '@actions/core';
+import { setFailed, getInput } from '@actions/core';
 import * as fs from 'fs';
 
 interface CoverageInterface {
@@ -29,6 +29,9 @@ type CompareResult = {
 async function run() {
 	let diffs: string[] = [];
 
+	const generalCoverageTolerance = +getInput("generalCoverageTolerance") || 0;
+	const singleLineCoverageTolerance = +getInput("singleLineCoverageTolerance") || 0;
+
     const basePath = './coverage-base/coverage-summary.json';
     const prPath = './coverage-pr/coverage-summary.json';
 
@@ -48,22 +51,30 @@ async function run() {
 		}
 
 		if (prFileObj.lines.pct < baseFileObj.lines.pct) {
-			diffCheck = true;
+			if ((prFileObj.lines.pct + singleLineCoverageTolerance) < baseFileObj.lines.pct) {
+				diffCheck = true;
+			}
 			result.linesPct = prFileObj.lines.pct - baseFileObj.lines.pct;
 		}
 
 		if (prFileObj.functions.pct < baseFileObj.functions.pct) {
-			diffCheck = true;
+			if ((prFileObj.functions.pct + singleLineCoverageTolerance) < baseFileObj.functions.pct) {
+				diffCheck = true;
+			}
 			result.functionsPct = prFileObj.functions.pct - baseFileObj.functions.pct;
 		}
 
 		if (prFileObj.statements.pct < baseFileObj.statements.pct) {
-			diffCheck = true;
+			if ((prFileObj.statements.pct + singleLineCoverageTolerance) < baseFileObj.statements.pct) {
+				diffCheck = true;
+			}
 			result.statementsPct = prFileObj.statements.pct - baseFileObj.statements.pct;
 		}
 
 		if (prFileObj.branches.pct < baseFileObj.branches.pct) {
-			diffCheck = true;
+			if ((prFileObj.branches.pct + singleLineCoverageTolerance) < baseFileObj.branches.pct) {
+				diffCheck = true;
+			}
 			result.branchesPct = prFileObj.branches.pct - baseFileObj.branches.pct;
 		}
 
@@ -86,6 +97,17 @@ async function run() {
 		const branchesDiff = prResultTotal.branches.pct - baseResultTotal.branches.pct;
 		const functionsDiff = prResultTotal.functions.pct - baseResultTotal.functions.pct;
 		const linesDiff = prResultTotal.lines.pct - baseResultTotal.lines.pct;
+
+		let generalDiffMessage = "";
+
+		if (
+			(prResultTotal.statements.pct - baseResultTotal.statements.pct) < -generalCoverageTolerance
+			|| (prResultTotal.branches.pct - baseResultTotal.branches.pct) < -generalCoverageTolerance
+			|| (prResultTotal.functions.pct - baseResultTotal.functions.pct) < -generalCoverageTolerance
+			|| (prResultTotal.lines.pct - baseResultTotal.lines.pct) < -generalCoverageTolerance
+		) {
+			generalDiffMessage = "The general coverage is worse than before and above the tolerance. You need to write more tests!";
+		}
 
 		const prFiles = Object.keys(prResultObject);
 
@@ -131,6 +153,8 @@ async function run() {
 
 		if (diffs.length > 0) {
 			throw new Error("Coverage action failed - Write more tests!");
+		} else if (generalDiffMessage !== "") {
+			throw new Error(generalDiffMessage);
 		} else {
 			console.log("Coverage is OK.")
 		}
