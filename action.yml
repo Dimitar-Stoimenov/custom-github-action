@@ -8,6 +8,9 @@ inputs:
   singleLineCoverageTolerance:
     description: "Maximum allowed difference in percentage for a single file."
     required: true
+  newFileCoverageThreshold:
+    description: "Minimum allowed test coverage in percentage for new/renamed files."
+    required: true
 
 runs:
   using: "node16"
