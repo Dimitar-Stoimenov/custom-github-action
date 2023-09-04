@@ -29,11 +29,13 @@ type CompareResult = {
 async function run() {
 	let diffs: string[] = [];
 
-	const generalCoverageTolerance = +getInput("generalCoverageTolerance") || 0;
-	const singleLineCoverageTolerance = +getInput("singleLineCoverageTolerance") || 0;
+	const generalCoverageTolerance = +getInput("generalCoverageTolerance") || 0.03;
+	const singleLineCoverageTolerance = +getInput("singleLineCoverageTolerance") || 5;
+	const newFileCoverageThreshold = +getInput("newFileCoverageThreshold") || 40;
 
 	console.log(`General coverage tolerance: ${generalCoverageTolerance.toFixed(2)}%`);
 	console.log(`Single file coverage tolerance: ${singleLineCoverageTolerance.toFixed(2)}%`);
+	console.log(`New file coverage threshold: ${newFileCoverageThreshold.toFixed(2)}%`);
 	console.log("");
 
     const basePath = './coverage-base/coverage-summary.json';
@@ -49,7 +51,15 @@ async function run() {
 		};
 
 		if (!baseFileObj) {
-			diffs.push(`${fileName} is a new or renamed file. Write tests for it!`);
+			if (fileName.includes("/dcbyte-web/server/migrations/") || fileName.includes("/dcbyte-web/scripts/")) {
+				return null;
+			}
+
+			const { branches: { pct: prBranchPct }, lines: { pct: prLinesPct }, functions: { pct: prFunctionsPct }, statements: { pct: prStatementsPct }} = prFileObj;
+
+			if (prBranchPct < newFileCoverageThreshold || prLinesPct < newFileCoverageThreshold || prStatementsPct < newFileCoverageThreshold || prFunctionsPct < newFileCoverageThreshold) {
+				diffs.push(`${fileName} >>> new or renamed file that does not meet the test coverage threshold of ${newFileCoverageThreshold}%! >>>\n${JSON.stringify(prFileObj)}`);
+			} 
 
 			return null;
 		}
