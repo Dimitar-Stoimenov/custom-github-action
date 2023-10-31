@@ -33,18 +33,20 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __nccwpck_require__(186);
 const fs = __importStar(__nccwpck_require__(147));
 async function run() {
-    var _a, _b, _c;
+    var _a, _b;
     let diffs = [];
     const generalCoverageTolerance = +(0, core_1.getInput)("generalCoverageTolerance") || 0.03;
     const singleLineCoverageTolerance = +(0, core_1.getInput)("singleLineCoverageTolerance") || 5;
     const newFileCoverageThreshold = +(0, core_1.getInput)("newFileCoverageThreshold") || 40;
-    const ignoredPaths = ((_b = (_a = (0, core_1.getInput)("ignoredFolders")) === null || _a === void 0 ? void 0 : _a.split(",")) === null || _b === void 0 ? void 0 : _b.map((pathString) => pathString.trim())) || [];
+    const ignoredPathsInput = (0, core_1.getInput)("ignoredPaths");
+    const ignoredPaths = (ignoredPathsInput === "" || !ignoredPathsInput) ? [] : (_a = ignoredPathsInput === null || ignoredPathsInput === void 0 ? void 0 : ignoredPathsInput.split(",")) === null || _a === void 0 ? void 0 : _a.map((pathString) => pathString.trim());
     console.log(`General coverage tolerance: ${generalCoverageTolerance.toFixed(2)}%`);
     console.log(`Single file coverage tolerance: ${singleLineCoverageTolerance.toFixed(2)}%`);
     console.log(`New file coverage threshold: ${newFileCoverageThreshold.toFixed(2)}%`);
     ignoredPaths.forEach((path) => {
         console.log(`Ignoring files in ${path}`);
     });
+    console.log("");
     const basePath = './coverage-base/coverage-summary.json';
     const prPath = './coverage-pr/coverage-summary.json';
     const compareFileCoverage = (prFileObj, baseFileObj, fileName) => {
@@ -55,10 +57,10 @@ async function run() {
             statementsPct: 0,
             branchesPct: 0
         };
+        if (ignoredPaths.length && ignoredPaths.some(folder => fileName.includes(folder))) {
+            return null;
+        }
         if (!baseFileObj) {
-            if (ignoredPaths.some(folder => fileName.includes(folder))) {
-                return null;
-            }
             const { branches: { pct: prBranchPct }, lines: { pct: prLinesPct }, functions: { pct: prFunctionsPct }, statements: { pct: prStatementsPct } } = prFileObj;
             if (prBranchPct < newFileCoverageThreshold || prLinesPct < newFileCoverageThreshold || prStatementsPct < newFileCoverageThreshold || prFunctionsPct < newFileCoverageThreshold) {
                 diffs.push(`${fileName} >>> new or renamed file that does not meet the test coverage threshold of ${newFileCoverageThreshold}%! >>>\n${JSON.stringify(prFileObj)}`);
@@ -155,7 +157,7 @@ async function run() {
         }
     }
     catch (error) {
-        (0, core_1.setFailed)((_c = error === null || error === void 0 ? void 0 : error.message) !== null && _c !== void 0 ? _c : 'Unknown error.');
+        (0, core_1.setFailed)((_b = error === null || error === void 0 ? void 0 : error.message) !== null && _b !== void 0 ? _b : 'Unknown error.');
     }
 }
 run();

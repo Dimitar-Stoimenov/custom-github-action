@@ -32,7 +32,8 @@ async function run() {
 	const generalCoverageTolerance = +getInput("generalCoverageTolerance") || 0.03;
 	const singleLineCoverageTolerance = +getInput("singleLineCoverageTolerance") || 5;
 	const newFileCoverageThreshold = +getInput("newFileCoverageThreshold") || 40;
-	const ignoredPaths = getInput("ignoredFolders")?.split(",")?.map((pathString) => pathString.trim()) || [];
+	const ignoredPathsInput = getInput("ignoredPaths");
+	const ignoredPaths = (ignoredPathsInput === "" || !ignoredPathsInput) ? [] : ignoredPathsInput?.split(",")?.map((pathString) => pathString.trim());
 
 	console.log(`General coverage tolerance: ${generalCoverageTolerance.toFixed(2)}%`);
 	console.log(`Single file coverage tolerance: ${singleLineCoverageTolerance.toFixed(2)}%`);
@@ -40,6 +41,7 @@ async function run() {
 	ignoredPaths.forEach((path) => {
 		console.log(`Ignoring files in ${path}`);
 	});
+	console.log("");
 
     const basePath = './coverage-base/coverage-summary.json';
     const prPath = './coverage-pr/coverage-summary.json';
@@ -53,11 +55,11 @@ async function run() {
 			branchesPct: 0
 		};
 
-		if (!baseFileObj) {
-			if (ignoredPaths.some(folder => fileName.includes(folder))) {
-				return null;
-			}
+		if (ignoredPaths.length && ignoredPaths.some(folder => fileName.includes(folder))) {
+			return null;
+		}
 
+		if (!baseFileObj) {
 			const { branches: { pct: prBranchPct }, lines: { pct: prLinesPct }, functions: { pct: prFunctionsPct }, statements: { pct: prStatementsPct }} = prFileObj;
 
 			if (prBranchPct < newFileCoverageThreshold || prLinesPct < newFileCoverageThreshold || prStatementsPct < newFileCoverageThreshold || prFunctionsPct < newFileCoverageThreshold) {
