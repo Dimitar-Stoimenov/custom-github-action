@@ -33,15 +33,18 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __nccwpck_require__(186);
 const fs = __importStar(__nccwpck_require__(147));
 async function run() {
-    var _a;
+    var _a, _b, _c;
     let diffs = [];
     const generalCoverageTolerance = +(0, core_1.getInput)("generalCoverageTolerance") || 0.03;
     const singleLineCoverageTolerance = +(0, core_1.getInput)("singleLineCoverageTolerance") || 5;
     const newFileCoverageThreshold = +(0, core_1.getInput)("newFileCoverageThreshold") || 40;
+    const ignoredPaths = ((_b = (_a = (0, core_1.getInput)("ignoredFolders")) === null || _a === void 0 ? void 0 : _a.split(",")) === null || _b === void 0 ? void 0 : _b.map((pathString) => pathString.trim())) || [];
     console.log(`General coverage tolerance: ${generalCoverageTolerance.toFixed(2)}%`);
     console.log(`Single file coverage tolerance: ${singleLineCoverageTolerance.toFixed(2)}%`);
     console.log(`New file coverage threshold: ${newFileCoverageThreshold.toFixed(2)}%`);
-    console.log("");
+    ignoredPaths.forEach((path) => {
+        console.log(`Ignoring files in ${path}`);
+    });
     const basePath = './coverage-base/coverage-summary.json';
     const prPath = './coverage-pr/coverage-summary.json';
     const compareFileCoverage = (prFileObj, baseFileObj, fileName) => {
@@ -53,7 +56,7 @@ async function run() {
             branchesPct: 0
         };
         if (!baseFileObj) {
-            if (fileName.includes("/dcbyte-web/server/migrations/") || fileName.includes("/dcbyte-web/scripts/")) {
+            if (ignoredPaths.some(folder => fileName.includes(folder))) {
                 return null;
             }
             const { branches: { pct: prBranchPct }, lines: { pct: prLinesPct }, functions: { pct: prFunctionsPct }, statements: { pct: prStatementsPct } } = prFileObj;
@@ -152,7 +155,7 @@ async function run() {
         }
     }
     catch (error) {
-        (0, core_1.setFailed)((_a = error === null || error === void 0 ? void 0 : error.message) !== null && _a !== void 0 ? _a : 'Unknown error.');
+        (0, core_1.setFailed)((_c = error === null || error === void 0 ? void 0 : error.message) !== null && _c !== void 0 ? _c : 'Unknown error.');
     }
 }
 run();
