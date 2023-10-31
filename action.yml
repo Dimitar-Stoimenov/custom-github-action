@@ -11,6 +11,9 @@ inputs:
   newFileCoverageThreshold:
     description: "Minimum allowed test coverage in percentage for new/renamed files."
     required: true
+  ignoredPaths:
+    description: "Paths to folders that should be ignored. You can specify multiple paths separated by commas."
+    required: false
 
 runs:
   using: "node16"

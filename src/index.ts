@@ -32,11 +32,14 @@ async function run() {
 	const generalCoverageTolerance = +getInput("generalCoverageTolerance") || 0.03;
 	const singleLineCoverageTolerance = +getInput("singleLineCoverageTolerance") || 5;
 	const newFileCoverageThreshold = +getInput("newFileCoverageThreshold") || 40;
+	const ignoredPaths = getInput("ignoredFolders")?.split(",")?.map((pathString) => pathString.trim()) || [];
 
 	console.log(`General coverage tolerance: ${generalCoverageTolerance.toFixed(2)}%`);
 	console.log(`Single file coverage tolerance: ${singleLineCoverageTolerance.toFixed(2)}%`);
 	console.log(`New file coverage threshold: ${newFileCoverageThreshold.toFixed(2)}%`);
-	console.log("");
+	ignoredPaths.forEach((path) => {
+		console.log(`Ignoring files in ${path}`);
+	});
 
     const basePath = './coverage-base/coverage-summary.json';
     const prPath = './coverage-pr/coverage-summary.json';
@@ -51,7 +54,7 @@ async function run() {
 		};
 
 		if (!baseFileObj) {
-			if (fileName.includes("/dcbyte-web/server/migrations/") || fileName.includes("/dcbyte-web/scripts/")) {
+			if (ignoredPaths.some(folder => fileName.includes(folder))) {
 				return null;
 			}
 
